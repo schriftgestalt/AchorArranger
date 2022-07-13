@@ -1,5 +1,7 @@
 # AchorArranger
+<img src="https://github.com/wsimm/AchorArranger/raw/master/AnchorArrangerScreenshot.png">
 Anchor Arranger is a <a href="http://glyphsapp.com/">Glyphs font editor.</a> plugin and it takes care of calculating the distance between the anchors and upper or the bottom node of the  glyphs and it allows you to move them easily to guarantee the consistency of your font
+
 <img src="https://github.com/wsimm/AchorArranger/blob/master/anchorArranger.gif?raw=true">
 ### Install
 
