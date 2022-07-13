@@ -17,7 +17,7 @@ Anchor Arranger is a <a href="http://glyphsapp.com/">Glyphs font editor.</a> plu
 
 ### License
 
-Copyright 2020 Wasim Alhajebi (**@wsimm**).
+Copyright 2022 Wasim Alhajebi (**@wsimm**).
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
