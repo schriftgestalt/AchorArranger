@@ -65,24 +65,25 @@ class AnchorArranger(PalettePlugin):
         self.name = "Anchor Arranger"
         # Create Vanilla window and group with controls
         width = 150
-        height = 130
+        height = 127
         self.w = Window((width, height))
         self.w.group = Group((0, 0, width, height))
 
-        self.w.group.TopAnchorsLabel= TextBox((10, 0, 60, 17), "Top Anchors")
-        self.w.group.TopAnchorsText = EditText((60, 0, 40, 26),self.GetTopMargin(),callback =  self.editTextTopMargin )
-        self.w.group.TopgradientButton = GradientButton( (110, 0, 40, 26),imageNamed=AppKit.NSImageNameTouchBarGoUpTemplate,callback=self.moveAnchorTop, imagePosition="top", sizeStyle="regular", )
-        self.w.group.BottomAnchorsLabel= TextBox((10, 30, 60, 17), "Bottom Anchors")
-        self.w.group.BottomAnchorsCurrentTop= TextBox((155,5, 60, 17), "0")
-        
-        self.w.group.BottomAnchorsText = EditText((60, 30, 40, 26), self.GetBottomMargin() ,callback =  self.editTextBottomMargin)
-        self.w.group.BottomgradientButton = GradientButton( (110, 30, 40, 26), imageNamed=AppKit.NSImageNameTouchBarGoDownTemplate,callback= self.moveAnchorBottom ,imagePosition="top", sizeStyle="regular", )
-        self.w.group.BottomAnchorsCurrentBottom= TextBox((155,35, 60, 17), "0")
+        self.w.group.TopAnchorsLabel= TextBox((10, 4, 60, 17), "Top Anchors")
+        self.w.group.TopAnchorsText = EditText((61, 1, 40, 23), self.GetTopMargin(), callback=self.editTextTopMargin)
+        self.w.group.TopButton = Button((107, 0, 30, 23), title="", callback=self.moveAnchorTop)
+        self.w.group.TopButton._nsObject.setImage_(NSImage.imageNamed_(AppKit.NSImageNameTouchBarGoUpTemplate))
+        self.w.group.TopAnchorsCurrent = TextBox((141, 4, 60, 17), "0")
 
-        self.w.group.Hline = HorizontalLine((10, 70, -10, 1))
-        self.w.group.textBox = TextBox((10, 60, -10, 20), "Arrangment type",alignment='center')
+        self.w.group.BottomAnchorsLabel = TextBox((10, 31, 60, 17), "Bottom Anchors")
+        self.w.group.BottomAnchorsText = EditText((61, 28, 40, 23), self.GetBottomMargin(), callback=self.editTextBottomMargin)
+        self.w.group.BottomButton = Button((107, 27, 30, 23), title="", callback=self.moveAnchorBottom)
+        self.w.group.BottomButton._nsObject.setImage_(NSImage.imageNamed_(AppKit.NSImageNameTouchBarGoDownTemplate))
+        self.w.group.BottomAnchorsCurrent = TextBox((141, 31, 60, 17), "0")
 
-        self.w.group.radioGroup = RadioGroup((10, 80, -10, 40), ["Glyph Last Node", "Current Position"] ,callback = self.radioGroupCallback) 
+        #self.w.group.Hline = HorizontalLine((10, 70, -10, 1))
+        self.w.group.textBox = TextBox((10, 60, -10, 20), "Arrangment type")
+        self.w.group.radioGroup = RadioGroup((10, 80, -10, 40), ["Glyph Last Node", "Current Position"], callback=self.radioGroupCallback)
         self.w.group.radioGroup.set(self.GetarrangeType())
 
         # Set dialog to NSView
@@ -148,7 +149,7 @@ class AnchorArranger(PalettePlugin):
             else:
                 self.moveTopByLastNode()
         else:
-            self.popoverView('Please Select A layer fist',self.w.group.TopgradientButton)
+            self.popoverView('Please Select A layer fist', self.w.group.TopButton)
 
     @objc.python_method
     def moveAnchorBottom(self, sender):
@@ -158,7 +159,7 @@ class AnchorArranger(PalettePlugin):
             else:
                 self.moveBottomByLastNode()
         else:
-            self.popoverView('Please Select A layer fist',self.w.group.BottomgradientButton)
+            self.popoverView('Please Select A layer fist', self.w.group.BottomButton)
 
     @objc.python_method
     def UpdateCurrentTopAnchorPosition(self):
@@ -168,7 +169,7 @@ class AnchorArranger(PalettePlugin):
                 if currentAnchor.selected:
                     currentAnchorSelected = currentAnchor
                     CurrentTopAnchorPosition = layer.bounds.size.height + layer.bounds.origin.y
-                    self.w.group.BottomAnchorsCurrentTop.set(currentAnchor.y - CurrentTopAnchorPosition)
+                    self.w.group.TopAnchorsCurrent.set(currentAnchor.y - CurrentTopAnchorPosition)
 
     @objc.python_method
     def UpdateCurrentBottomAnchorPosition(self):
@@ -178,7 +179,7 @@ class AnchorArranger(PalettePlugin):
                 if currentAnchor.selected:
                     currentAnchorSelected = currentAnchor
                     CurrentTopAnchorPosition = layer.bounds.size.height - layer.bounds.origin.y
-                    self.w.group.BottomAnchorsCurrentBottom.set(layer.bounds.origin.y -currentAnchor.y )
+                    self.w.group.BottomAnchorsCurrent.set(layer.bounds.origin.y - currentAnchor.y)
 
 
 
