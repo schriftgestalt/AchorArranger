@@ -11,21 +11,20 @@
 #
 ###########################################################################################################
 # from __future__ import division, print_function, unicode_literals
+
 import objc
-from GlyphsApp import *
-from GlyphsApp.plugins import *
-from vanilla import Window, Button, EditText, TextBox, ImageButton, ImageView, HorizontalLine, Button, RadioGroup, ActionButton, Popover, Group
-import AppKit
-import re #for checking numbers in string
+import re  #for checking numbers in string
+from GlyphsApp import Glyphs, GSEditViewController, UPDATEINTERFACE
+from GlyphsApp.plugins import PalettePlugin
+from vanilla import Window, Button, EditText, TextBox, RadioGroup, Popover, Group
+from AppKit import NSImage, NSImageNameTouchBarGoUpTemplate, NSImageNameTouchBarGoDownTemplate
 from Foundation import NSPoint
-
-
 
 
 defaultMarginDigit = 62
 class AnchorArranger(PalettePlugin):
     def GetarrangeType(self):
-        ################# Top 
+        ################# Top
         if hasattr(Glyphs.font, 'userData'):
             if Glyphs.font.userData['arrangeType']:
                 arrangeType = Glyphs.font.userData['arrangeType']
@@ -35,11 +34,12 @@ class AnchorArranger(PalettePlugin):
             arrangeType = 0
         return int(arrangeType)
 
-    def GetTopMargin(self):
-        ################# Top 
+    def GetTopMargin(self) -> int:
+        ################# Top
         if hasattr(Glyphs.font, 'userData'):
-            if Glyphs.font.userData['TopMargin'] or Glyphs.font.userData['TopMargin'] == 0 :
-                anchorTopMargin = Glyphs.font.userData['TopMargin']
+            userMargin = Glyphs.font.userData['TopMargin']
+            if userMargin or userMargin == 0:
+                anchorTopMargin = userMargin
             else:
                 anchorTopMargin = defaultMarginDigit
         else:
@@ -48,10 +48,10 @@ class AnchorArranger(PalettePlugin):
 
     def GetBottomMargin(self):
         ################# Bottom
-        anchorBottomMargin2 = Glyphs.font.userData['BottomMargin']
+        userMargin = Glyphs.font.userData['BottomMargin']
         if hasattr(Glyphs.font, 'userData'):
-            if  Glyphs.font.userData['BottomMargin']  or Glyphs.font.userData['BottomMargin']== 0:
-                anchorBottomMargin = Glyphs.font.userData['BottomMargin']
+            if userMargin or userMargin == 0:
+                anchorBottomMargin = userMargin
             else:
                 anchorBottomMargin = defaultMarginDigit
         else:
@@ -69,16 +69,16 @@ class AnchorArranger(PalettePlugin):
         self.w = Window((width, height))
         self.w.group = Group((0, 0, width, height))
 
-        self.w.group.TopAnchorsLabel= TextBox((10, 4, 60, 17), "Top Anchors")
+        self.w.group.TopAnchorsLabel = TextBox((10, 4, 60, 17), "Top Anchors")
         self.w.group.TopAnchorsText = EditText((61, 1, 40, 23), self.GetTopMargin(), callback=self.editTextTopMargin)
         self.w.group.TopButton = Button((107, 0, 30, 23), title="", callback=self.moveAnchorTop)
-        self.w.group.TopButton._nsObject.setImage_(NSImage.imageNamed_(AppKit.NSImageNameTouchBarGoUpTemplate))
+        self.w.group.TopButton.getNSButton().setImage_(NSImage.imageNamed_(NSImageNameTouchBarGoUpTemplate))
         self.w.group.TopAnchorsCurrent = TextBox((141, 4, 60, 17), "0")
 
         self.w.group.BottomAnchorsLabel = TextBox((10, 31, 60, 17), "Bottom Anchors")
         self.w.group.BottomAnchorsText = EditText((61, 28, 40, 23), self.GetBottomMargin(), callback=self.editTextBottomMargin)
         self.w.group.BottomButton = Button((107, 27, 30, 23), title="", callback=self.moveAnchorBottom)
-        self.w.group.BottomButton._nsObject.setImage_(NSImage.imageNamed_(AppKit.NSImageNameTouchBarGoDownTemplate))
+        self.w.group.BottomButton.getNSButton().setImage_(NSImage.imageNamed_(NSImageNameTouchBarGoDownTemplate))
         self.w.group.BottomAnchorsCurrent = TextBox((141, 31, 60, 17), "0")
 
         #self.w.group.Hline = HorizontalLine((10, 70, -10, 1))
@@ -116,15 +116,16 @@ class AnchorArranger(PalettePlugin):
                     dummyvalue = None
                 else:
                     Glyphs.font.userData['BottomMargin'] = int(float(BottomMargin))
+
     @objc.python_method
     def start(self):
         Glyphs.addCallback(self.update, UPDATEINTERFACE)
 
-    @objc.python_method	
+    @objc.python_method
     def __del__(self):
         Glyphs.removeCallback(self.update)
 
-    @objc.python_method  
+    @objc.python_method
     def update(self, sender):
         currentTab = sender.object()
         if isinstance(currentTab, GSEditViewController):
@@ -181,13 +182,11 @@ class AnchorArranger(PalettePlugin):
                     CurrentTopAnchorPosition = layer.bounds.size.height - layer.bounds.origin.y
                     self.w.group.BottomAnchorsCurrent.set(layer.bounds.origin.y - currentAnchor.y)
 
-
-
     @objc.python_method
     def moveBottomByAnchor(self):
         if Glyphs.font.selectedLayers:
             layer = Glyphs.font.selectedLayers[0]
-            anchorsSelectedCount = 0 
+            anchorsSelectedCount = 0
             for currentAnchor in Glyphs.font.selectedLayers[0].anchors:
                 if currentAnchor.selected:
                     anchorsSelectedCount += 1
@@ -197,11 +196,10 @@ class AnchorArranger(PalettePlugin):
                 self.popoverView('Please Select At less one Anchor', self.w.group.TopAnchorsLabel)
 
     @objc.python_method
-
     def moveBottomByLastNode(self):
         if Glyphs.font.selectedLayers:
             layer = Glyphs.font.selectedLayers[0]
-            anchorsSelectedCount = 0 
+            anchorsSelectedCount = 0
             for currentAnchor in Glyphs.font.selectedLayers[0].anchors:
                 if currentAnchor.selected:
                     anchorsSelectedCount += 1
@@ -211,11 +209,10 @@ class AnchorArranger(PalettePlugin):
                 self.popoverView('Please Select At less one Anchor', self.w.group.TopAnchorsLabel)
 
     @objc.python_method
-
     def moveTopByAnchor(self):
         if Glyphs.font.selectedLayers:
             layer = Glyphs.font.selectedLayers[0]
-            anchorsSelectedCount = 0 
+            anchorsSelectedCount = 0
             for currentAnchor in Glyphs.font.selectedLayers[0].anchors:
                 if currentAnchor.selected:
                     anchorsSelectedCount += 1
@@ -225,11 +222,10 @@ class AnchorArranger(PalettePlugin):
                 self.popoverView('Please Select At less one Anchor', self.w.group.TopAnchorsLabel)
 
     @objc.python_method
-
     def moveTopByLastNode(self):
         if Glyphs.font.selectedLayers:
             layer = Glyphs.font.selectedLayers[0]
-            anchorsSelectedCount = 0 
+            anchorsSelectedCount = 0
             current_top_position = layer.bounds.size.height + layer.bounds.origin.y
             for currentAnchor in Glyphs.font.selectedLayers[0].anchors:
                 if currentAnchor.selected:
